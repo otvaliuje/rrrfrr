@@ -9,20 +9,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Kodu İndir (Checkout)
+    - name: Kodu indir
       uses: actions/checkout@v3
 
-    - name: Docker Hub'a Giriş Yap
+    - name: Docker huba giriş yap
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_KULLANICI_ADI }}
         password: ${{ secrets.DOCKER_SIFRESI }}
 
-    - name: Docker İmajını Derle ve Yükle (Build & Push)
+    - name: build & push
       run: |
         docker build -t ${{ secrets.DOCKER_KULLANICI_ADI }}/anket-app:latest .
         docker push ${{ secrets.DOCKER_KULLANICI_ADI }}/anket-app:latest
 
-    - name: Kubernetes Cluster'a Deploy Et
+    - name: Kubernetes clustera deploy et
       run: |
-        echo "GKE Deploy adımı başarıyla tetiklendi."
+        echo "Devam edemiyorum."
