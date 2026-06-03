@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mongodb-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: mongodb-stateful
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: anket-web
+    ports:
+    - protocol: TCP
+      port: 27017
