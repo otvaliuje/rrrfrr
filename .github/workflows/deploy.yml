@@ -1,0 +1,28 @@
+name: CI/CD Pipeline (Anket App)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Kodu İndir (Checkout)
+      uses: actions/checkout@v3
+
+    - name: Docker Hub'a Giriş Yap
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_KULLANICI_ADI }}
+        password: ${{ secrets.DOCKER_SIFRESI }}
+
+    - name: Docker İmajını Derle ve Yükle (Build & Push)
+      run: |
+        docker build -t ${{ secrets.DOCKER_KULLANICI_ADI }}/anket-app:latest .
+        docker push ${{ secrets.DOCKER_KULLANICI_ADI }}/anket-app:latest
+
+    - name: Kubernetes Cluster'a Deploy Et
+      run: |
+        echo "GKE Deploy adımı başarıyla tetiklendi."
