@@ -7,6 +7,11 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    
+    # КРИТИЧЕСКИ ВАЖНО: Разрешения для работы авторизации без ключей
+    permissions:
+      contents: 'read'
+      id-token: 'write'
 
     steps:
     - name: Kodu indir
@@ -23,6 +28,20 @@ jobs:
         docker build -t ${{ secrets.DOCKER_KULLANICI_ADI }}/anket-app:latest .
         docker push ${{ secrets.DOCKER_KULLANICI_ADI }}/anket-app:latest
 
+    - name: Google Cloud'a Kimlik Doğrulama (OIDC)
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: 'projects/768074701552/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+        service_account: 'github-actions-cd@project-80d115df-cf6b-439d-b92.iam.gserviceaccount.com'
+
+    - name: GKE Cluster'a Bağlan
+      uses: google-github-actions/get-gke-credentials@v1
+      with:
+        cluster_name: anket-cluster
+        location: us-central1
+        project_id: project-80d115df-cf6b-439d-b92
+
     - name: Kubernetes clustera deploy et
       run: |
-        echo "Devam edemiyorum."
+        kubectl apply -f kubernetes/
+        kubectl rollout restart deployment anket-app-deployment
